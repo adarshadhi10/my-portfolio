@@ -1,0 +1,35 @@
+name: Minify Assets
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  minify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Minify HTML
+        run: npx html-minifier-cli --collapse-whitespace --remove-comments index.html -o index.min.html
+
+      - name: Minify CSS
+        run: npx clean-css-cli -o style.min.css style.css
+
+      - name: Minify JS
+        run: npx terser script.js -o script.min.js --compress --mangle
+
+      - name: Commit minified files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git mv index.min.html index.html
+          git mv style.min.css style.css
+          git mv script.min.js script.js
+          git commit -am "Auto-minify assets"
+          git push
