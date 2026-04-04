@@ -304,57 +304,32 @@ footer {
     margin-top: auto;
 }
 
-/* ===== MOBILE TABS FIX ===== */
+/* ===== MOBILE TAB FIX (NO WRAP) ===== */
 @media (max-width: 768px) {
-    .nav-links {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); /* 2 per row */
-        gap: 0.5rem;
-        width: 100%;
-    }
-
-    .nav-links li {
-        width: 100%;
-    }
-
-    .nav-links a {
-        display: block;
-        width: 100%;
-        text-align: center;
-        font-size: 0.9rem;
-        padding: 0.5em;
-        border-radius: 6px;
-        background: rgba(255, 255, 255, 0.05); /* subtle button feel */
-    }
-
-    .nav-links a:hover {
-        background-color: #ffa87d;
-        color: #0d1117;
-    }
-}@media (max-width: 768px) {
-    .navbar {
-        padding: 0.6em;
-    }
 
     .nav-links {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-        width: 100%;
+        flex-wrap: nowrap; /* keep in one row */
+        overflow-x: auto;  /* allow scroll if needed */
+        gap: 0.6rem;
+        padding: 0 0.5rem;
     }
 
     .nav-links li {
-        flex: 1 1 auto;
-        text-align: center;
+        flex: 0 0 auto;
     }
 
     .nav-links a {
         display: block;
-        width: 100%;
+        white-space: nowrap; /* 🔥 prevents 2 lines */
         font-size: 0.85rem;
-        padding: 0.4em 0.3em;
+        padding: 0.4em 0.6em;
         border-radius: 6px;
-        white-space: nowrap;
+        background: rgba(255,255,255,0.05);
+    }
+
+    /* optional smooth scroll feel */
+    .nav-links::-webkit-scrollbar {
+        display: none;
     }
 }
