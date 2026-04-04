@@ -303,3 +303,32 @@ footer {
     color: #aaa;
     margin-top: auto;
 }
+
+/* ===== MOBILE TABS FIX ===== */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.6em;
+    }
+
+    .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .nav-links li {
+        flex: 1 1 auto;
+        text-align: center;
+    }
+
+    .nav-links a {
+        display: block;
+        width: 100%;
+        font-size: 0.85rem;
+        padding: 0.4em 0.3em;
+        border-radius: 6px;
+        white-space: nowrap;
+    }
+}
