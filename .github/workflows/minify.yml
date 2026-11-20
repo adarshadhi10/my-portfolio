@@ -1,36 +1,75 @@
-name: Minify Assets
+name: Build Minified Site
 
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "dist/**"
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "dist/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  minify:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "20"
+
+      - name: Install minifiers
+        run: npm install --global html-minifier-terser clean-css-cli terser
+
+      - name: Prepare output directory
+        run: mkdir -p dist/assets
 
       - name: Minify HTML
-        run: |npm install -g html-minifier html-minifier --collapse-whitespace --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true -o index.min.html index.html
-
+        run: >-
+          html-minifier-terser index.html
+          --collapse-whitespace
+          --remove-comments
+          --remove-redundant-attributes
+          --remove-script-type-attributes
+          --remove-tag-whitespace
+          --use-short-doctype
+          --minify-css true
+          --minify-js true
+          --output dist/index.html
 
       - name: Minify CSS
-        run: npx clean-css-cli -o style.min.css style.css
+        run: cleancss -o dist/style.css style.css
 
-      - name: Minify JS
-        run: npx terser script.js -o script.min.js --compress --mangle
+      - name: Minify JavaScript
+        run: terser script.js --compress --mangle --output dist/script.js
 
-      - name: Commit minified files
+      - name: Copy site assets
+        run: cp -R assets/. dist/assets/
+
+      - name: Check build output
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git mv index.min.html index.html
-          git mv style.min.css style.css
-          git mv script.min.js script.js
-          git commit -am "Auto-minify assets"
+          test -s dist/index.html
+          test -s dist/style.css
+          test -s dist/script.js
+          test -s dist/assets/favicon.svg
+          test -s dist/assets/profile.jpg
+          test -s dist/assets/resume.pdf
+
+      - name: Commit minified site
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git add dist
+          if git diff --cached --quiet; then
+            echo "Minified site is already up to date."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Build minified site"
           git push
